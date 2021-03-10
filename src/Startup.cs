@@ -8,6 +8,7 @@ using RabbitMQ.Client;
 using System;
 using BoxService.Consumers;
 using BoxService.Daemons;
+using BoxService.Services;
 
 namespace BoxService
 {
@@ -23,6 +24,7 @@ namespace BoxService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHealthChecks();
+            services.AddTransient<IBoxPrinterService, BoxPrinterService>();
 
             services.AddMassTransit(c =>
             {
@@ -40,7 +42,6 @@ namespace BoxService
                     services.AddSingleton<IPublishEndpoint>(p => p.GetRequiredService<IBusControl>());
                     services.AddSingleton<ISendEndpointProvider>(p => p.GetRequiredService<IBusControl>());
                     services.AddSingleton<IBus>(p => p.GetRequiredService<IBusControl>());
-
 
                     cfg.ReceiveEndpoint("box-created",
                         ep =>

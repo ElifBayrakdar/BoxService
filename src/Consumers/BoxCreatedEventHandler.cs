@@ -2,33 +2,33 @@ using System;
 using System.Threading.Tasks;
 using MassTransit;
 using BoxApi;
+using BoxService.Services;
 using Microsoft.Extensions.Logging;
 
 namespace BoxService.Consumers
 {
     public class BoxCreatedEventHandler : IConsumer<BoxCreated>
     {
-        private readonly IPublishEndpoint _endpoint;
+        private readonly IBoxPrinterService _boxPrinterService;
         private readonly ILogger<BoxCreatedEventHandler> _logger;
 
-        public BoxCreatedEventHandler(IPublishEndpoint endpoint, ILogger<BoxCreatedEventHandler> logger)
+        public BoxCreatedEventHandler(IBoxPrinterService boxPrinterService, ILogger<BoxCreatedEventHandler> logger)
         {
-            _endpoint = endpoint;
+            _boxPrinterService = boxPrinterService;
             _logger = logger;
         }
 
         public async Task Consume(ConsumeContext<BoxCreated> context)
         {
             var message = context.Message;
-            
             try
             {
-                PrintLabelCommand msg = new PrintLabelCommand(){Id = new Random(10).Next(), Label = $"Box {DateTime.Now}"};
-                await _endpoint.Publish(msg);
+                await _boxPrinterService.PrintBox(message);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
+                throw;
             }
         }
     }

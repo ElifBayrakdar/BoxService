@@ -16,6 +16,10 @@ namespace BoxService.Services
 
         public async Task PrintBox(BoxCreated boxCreated)
         {
+            //Create label template
+            await Task.Delay(5000);
+            
+            //Publish PrintLabelCommand
             int id = new Random().Next(1000);
             PrintLabelCommand msg = new PrintLabelCommand {Id = id, Label = $"Box-{id}"};
             await _endpoint.Publish(msg);
